@@ -1,0 +1,94 @@
+
+---
+title: "Práctico 2"
+author: "Dario Chávez"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+## Pregunta 1
+
+Queremos programar un programa de tipo web scrapping con el que podamos obtener 
+una página web, mediante su URL, y poder analizar su contenido HTML con tal de extraer 
+datos e información específica. 
+Nuestro programa ha de ser capaz de cumplir con los siguientes pasos: 
+
+### 1. Descargar la página web de la URL indicada, y almacenarlo en un formato de R apto para ser tratado
+
+El primer paso para realizar tareas de crawling y scraping es poder descargar los 
+datos de la web. Para esto usaremos la capacidad de R y de sus librerías (httr y 
+XML) para descargar webs y almacenarlas en variables que podamos convertir 
+en un formato fácil de analizar (p.e. de HTML a XML). 
+
+```{r setup, include=TRUE}
+# Cargar librerías
+library(httr)
+library(XML)
+
+# Descargar la página
+url <- "https://www.mediawiki.org/wiki/MediaWiki"
+response <- GET(url)
+
+# Convertir HTML a XML
+content_xml <- htmlParse(content(response, as = "text"))
+```
+
+### 2. Analizar el contenido de la web, buscando el título de la página (que en HTML se etiqueta como “title”). 
+
+En las cabeceras web encontramos información como el título, los ficheros de 
+estilo visual, y meta-información como el nombre del autor de la página, una 
+descripción de esta, el tipo de codificación de esta, o palabras clave que indican 
+qué tipo de información contiene la página. Una vez descargada la página, y 
+convertida a un formato analizable (como XML), buscaremos los elementos de 
+tipo “title”. P.e. “<title>Titulo de Página</title>”. 
+
+
+
+### 3. Analizar el contenido de la web, buscando todos los enlaces (que en HTML se etiquetan como “a”), buscando el texto del enlace, así como la URL. 
+
+Vamos a extraer, usando las funciones de búsqueda XML, todos los enlaces que 
+salen de esta página con tal de listarlos y poder descargarlas más tarde. Sabemos 
+que estos son elementos de tipo “<a>”, que tienen el atributo “href” para indicar 
+la URL del enlace. P.e. “<a href = ‘enlace’>Texto del Enlace</a>”. Del enlace 
+nos quedaremos con la URL de destino y con el valor del enlace (texto del 
+enlace). 
+
+### 4. AGenerar una tabla con cada enlace encontrado, indicando el texto que acompaña el enlace, y el número de veces que aparece un enlace con ese mismo objetivo. 
+
+En este paso nos interesa reunir los datos obtenidos en el anterior paso. 
+Tendremos que comprobar, para cada enlace, cuantas veces aparece. 
+
+### 5. Para cada enlace, seguirlo e indicar si está activo (podemos usar el código de status HTTP al hacer una petición a esa URL). 
+En este paso podemos usar la función HEAD de la librería “httr”, que en vez de 
+descargarse la página como haría GET, solo consultamos los atributos de la 
+página o fichero destino. 
+HEAD nos retorna una lista de atributos, y de entre estos hay uno llamado 
+“header” que contiene más atributos sobre la página buscada. Si seguimos 
+podemos encontrar el “status_code” en “resultado$status_code”. El 
+“status_code” nos indica el resultado de la petición de página o fichero. Este 
+código puede indicar que la petición ha sido correcta (200), que no se ha 
+encontrado (404), que el acceso está restringido (403), etc. 
+Actividad Evaluable 2 
+3 
+Máster en Gestión de la Ciberseguridad - Data Driven Security – 2024 / 2025 
+• Tened en cuenta que hay enlaces con la URL relativa, con forma 
+“/xxxxxx/xxxxx/a.html”. En este caso, podemos indicarle como “handle” el 
+dominio de la página que estamos tratando, o añadirle el dominio a la URL 
+con la función “paste”.  
+• Tened en cuenta que puede haber enlaces externos con la URL absoluta, con 
+forma “http://xxxxxx/xxxx/a.html” (o https), que los trataremos 
+directamente. 
+• Tened en cuenta que puede haber enlaces que apunten a subdominios 
+distintos, con forma “//subdominio/xxxx/xxxx/a.html”. En este caso 
+podemos adjuntarle el prefijo “https:” delante, convirtiendo la URL en 
+absoluta. 
+• Tened en cuenta URLS internas con tags, como por ejemplo “#search-p”. 
+Estos apuntan a la misma página en la que estamos, pero diferente altura de 
+página. Equivale a acceder a la URL relativa de la misma página en la que 
+estamos. 
+Es recomendado poner un tiempo de espera entre petición y petición de pocos 
+segundos (comando “Sys.sleep”), para evitar ser “baneados” por el servidor. Para 
+poder examinar las URLs podemos usar expresiones regulares, funciones como 
+“grep”, o mirar si en los primeros caracteres de la URL encontramos “//” o “http”. 
+Para tratar las URLs podemos usar la ayuda de la función “paste”, para manipular 
+cadenas de caracteres y poder añadir prefijos a las URLs si fuera necesario.
