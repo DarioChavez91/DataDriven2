@@ -20,7 +20,9 @@ datos de la web. Para esto usaremos la capacidad de R y de sus librerías (httr 
 XML) para descargar webs y almacenarlas en variables que podamos convertir 
 en un formato fácil de analizar (p.e. de HTML a XML). 
 
-```{r setup, include=TRUE}
+```{r setup1, include=TRUE}
+##PREGUNTA 1.1
+
 # Cargar librerías
 library(httr)
 library(XML)
@@ -52,6 +54,20 @@ que estos son elementos de tipo “<a>”, que tienen el atributo “href” par
 la URL del enlace. P.e. “<a href = ‘enlace’>Texto del Enlace</a>”. Del enlace 
 nos quedaremos con la URL de destino y con el valor del enlace (texto del 
 enlace). 
+
+```{r setup3, include=TRUE}
+##PREGUNTA 1.3
+
+# Extraer enlaces y textos
+links <- xpathSApply(content_xml, "//a", xmlGetAttr, "href")
+texts <- xpathSApply(content_xml, "//a", xmlValue)
+
+# Limpiar valores nulos
+links[is.null(links)] <- NA
+texts[is.null(texts)] <- NA
+links <- unlist(links)
+texts <- unlist(texts)
+```
 
 ### 4. AGenerar una tabla con cada enlace encontrado, indicando el texto que acompaña el enlace, y el número de veces que aparece un enlace con ese mismo objetivo. 
 
@@ -92,3 +108,63 @@ poder examinar las URLs podemos usar expresiones regulares, funciones como
 “grep”, o mirar si en los primeros caracteres de la URL encontramos “//” o “http”. 
 Para tratar las URLs podemos usar la ayuda de la función “paste”, para manipular 
 cadenas de caracteres y poder añadir prefijos a las URLs si fuera necesario.
+
+```{r setup5, include=TRUE}
+##PREGUNTA 1.5
+
+# Crear data.frame
+data <- data.frame(Link = links, Text = texts)
+data_summary <- as.data.frame(table(data$Link))
+
+# Renombrar columnas
+colnames(data_summary) <- c("Link", "Frequency")
+
+# Base URL del dominio
+base_url <- "https://www.mediawiki.org"
+
+# Procesar cada enlace del data.frame original 'data'
+data$status_code <- sapply(data$Link, function(link) {
+  # Manejo de enlaces (relativos, absolutos, subdominios e internos)
+  if (is.na(link)) {
+    full_url <- NA
+  } else if (grepl("^http", link)) {
+    full_url <- link  # URLs absolutas
+  } else if (grepl("^//", link)) {
+    full_url <- paste0("https:", link)  # Subdominios
+  } else if (grepl("^#", link)) {
+    full_url <- paste0(base_url, link)  # URLs internas con tags
+  } else {
+    full_url <- paste0(base_url, link)  # URLs relativas
+  }
+  
+  # Intentar obtener el código de estado usando HEAD
+  tryCatch({
+    if (!is.na(full_url)) {
+      response <- HEAD(full_url)
+      status_code <- response$status_code
+    } else {
+      status_code <- NA
+    }
+  }, error = function(e) {
+    status_code <- NA  # Asignar NA en caso de error
+  })
+  
+  # Pausa entre solicitudes para evitar ser "baneados"
+  Sys.sleep(1)
+  
+  # Retornar el código de estado
+  return(status_code)
+})
+
+# Resumir los datos en el data.frame final 'final_data'
+library(dplyr)
+
+final_data <- data %>%
+  group_by(Link) %>%
+  summarize(
+    Text = first(Text),
+    Frequency = n(),
+    Status_Code = first(status_code)
+  )
+
+```

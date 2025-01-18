@@ -13,6 +13,24 @@ siguientes detalles:
 
 ### 1. Un histograma con la frecuencia de aparición de los enlaces, pero separado por URLs absolutas (con “http…”) y URLs relativas. 
 
+```{r setup1, include=TRUE}
+##PREGUNTA 2.1
+
+# Categorizar URLs como absolutas o relativas
+data$Type <- ifelse(grepl("^http", data$Link), "Absoluta", "Relativa")
+
+# Crear histograma
+library(ggplot2)
+
+histogram_plot <- ggplot(data, aes(x = Type, fill = Type)) +
+  geom_bar() +
+  ggtitle("Frecuencia de URLs Absolutas vs Relativas") +
+  xlab("Tipo de URL") +
+  ylab("Frecuencia") +
+  theme_minimal()
+
+print(histogram_plot)
+```
 
 ### 2. Un gráfico de barras indicando la suma de enlaces que apuntan a otros  dominios o servicios (distinto a https://www.mediawiki.org en el caso de ejemplo) vs. la suma de los otros enlaces.
 
@@ -27,3 +45,23 @@ Por ejemplo, si hay 6 enlaces con status “200” y 4 enlaces con status “404
 tarta mostrará un 60% con la etiqueta “200” y un 40% con la etiqueta “404”. Este 
 gráfico lo uniremos a los anteriores. El objetivo final es obtener una imagen que 
 recopile los gráficos generados. 
+
+```{r setup3, include=TRUE}
+##PREGUNTA 2.3
+
+# Resumir códigos de estado
+status_summary <- table(data$status_code)
+status_percent <- prop.table(status_summary) * 100
+
+# Darle color al pastel
+library(RColorBrewer)
+myPalette <- brewer.pal(5, "Set2") 
+
+# Crear gráfico de pastel
+pie_chart <- pie(
+  status_percent,
+  labels = paste0(names(status_percent), " (", round(status_percent, 1), "%)"),
+  main = "Distribución de Códigos de Estado",border="white", col=myPalette
+)
+
+```
