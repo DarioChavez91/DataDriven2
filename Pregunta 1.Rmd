@@ -1,10 +1,24 @@
-
 ---
 title: "Práctico 2"
-author: "Dario Chávez"
+author: "Dario Chávez & Elkin Rodríguez"
 date: "`r Sys.Date()`"
 output: html_document
 ---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+## Cargar librerías
+
+# Suprimir mensajes de advertencia al cargar 'dplyr'
+capture.output(suppressPackageStartupMessages(library(dplyr)), type = "message")
+
+
+# Cargar otras librerías
+library(httr)
+library(XML)
+library(ggplot2)
+library(RColorBrewer)
 
 ## Pregunta 1
 
@@ -44,6 +58,17 @@ qué tipo de información contiene la página. Una vez descargada la página, y
 convertida a un formato analizable (como XML), buscaremos los elementos de 
 tipo “title”. P.e. “<title>Titulo de Página</title>”. 
 
+```{r setup2, include=TRUE}
+obtener_titulo <- function(xml_contenido) {
+  titulo <- xpathSApply(xml_contenido, "//title", xmlValue)
+  return(titulo)
+}
+
+# Ejemplo de uso
+titulo <- obtener_titulo(content_xml)
+cat("Título de la página:", titulo, "\n")
+```
+
 
 
 ### 3. Analizar el contenido de la web, buscando todos los enlaces (que en HTML se etiquetan como “a”), buscando el texto del enlace, así como la URL. 
@@ -73,6 +98,36 @@ texts <- unlist(texts)
 
 En este paso nos interesa reunir los datos obtenidos en el anterior paso. 
 Tendremos que comprobar, para cada enlace, cuantas veces aparece. 
+
+```{r setup4, include=TRUE}
+# Función para generar tabla de frecuencias y mantener el dataframe original
+procesar_enlaces <- function(links, texts) {
+  # Crear el dataframe con enlaces y textos
+  data <- data.frame(Link = links, Text = texts, stringsAsFactors = FALSE)
+  
+  # Generar la tabla de frecuencias
+  data_summary <- as.data.frame(table(data$Link), stringsAsFactors = FALSE)
+  
+  # Renombrar columnas para mayor claridad
+  colnames(data_summary) <- c("Link", "Frequency")
+  
+  # Ordenar la tabla de frecuencias por frecuencia descendente
+  data_summary <- data_summary[order(-data_summary$Frequency), ]
+  
+  # Devolver tanto la tabla de frecuencias como el dataframe original
+  return(list(data = data, data_summary = data_summary))
+}
+
+# Llamar a la función y guardar los resultados
+resultados <- procesar_enlaces(links, texts)
+
+# Separar los resultados
+data <- resultados$data
+data_summary <- resultados$data_summary
+
+# Mostrar las primeras filas de la tabla de frecuencias
+head(data_summary)
+```
 
 ### 5. Para cada enlace, seguirlo e indicar si está activo (podemos usar el código de status HTTP al hacer una petición a esa URL). 
 En este paso podemos usar la función HEAD de la librería “httr”, que en vez de 
@@ -166,5 +221,100 @@ final_data <- data %>%
     Frequency = n(),
     Status_Code = first(status_code)
   )
+
+```
+
+
+
+## Pregunta 2
+
+Elaborad, usando las librerías de gráficos base y qplot (ggplot2), una infografía sobre los 
+datos obtenidos. Tal infografía será una reunión de gráficos donde se muestren los 
+siguientes detalles: 
+
+### 1. Un histograma con la frecuencia de aparición de los enlaces, pero separado por URLs absolutas (con “http…”) y URLs relativas. 
+
+```{r setup21, include=TRUE}
+##PREGUNTA 2.1
+
+# Categorizar URLs como absolutas o relativas
+data$Type <- ifelse(grepl("^http", data$Link), "Absoluta", "Relativa")
+
+# Crear histograma
+library(ggplot2)
+
+histogram_plot <- ggplot(data, aes(x = Type, fill = Type)) +
+  geom_bar() +
+  ggtitle("Frecuencia de URLs Absolutas vs Relativas") +
+  xlab("Tipo de URL") +
+  ylab("Frecuencia") +
+  theme_minimal()
+
+print(histogram_plot)
+```
+
+### 2. Un gráfico de barras indicando la suma de enlaces que apuntan a otros  dominios o servicios (distinto a https://www.mediawiki.org en el caso de ejemplo) vs. la suma de los otros enlaces.
+
+Aquí queremos distinguir enlaces que apuntan a mediawiki versus el resto. 
+Sabemos que las URLs relativas ya apuntan dentro, por lo tanto hay que analizar 
+las URLs absolutas y comprobar que apunten a https://www.mediawiki.org.
+
+```{r setup22, include=TRUE}
+# Función para clasificar enlaces y generar el gráfico de barras
+clasificar_y_graficar_enlaces <- function(data, dominio_interno = "mediawiki.org") {
+  library(ggplot2)
+  
+  # Clasificar enlaces como internos o externos
+  data$Domain <- ifelse(
+    grepl(dominio_interno, data$Link, fixed = TRUE), 
+    "Interno", 
+    "Externo"
+  )
+  
+  # Crear el gráfico de barras
+  bar_plot <- ggplot(data, aes(x = Domain, fill = Domain)) +
+    geom_bar() +
+    ggtitle("Enlaces Internos vs Externos") +
+    xlab("Tipo de Enlace") +
+    ylab("Cantidad") +
+    scale_fill_manual(values = c("Interno" = "#1f78b4", "Externo" = "#33a02c")) + # Colores personalizados
+    theme_minimal() +
+    theme(
+      legend.position = "none", # Ocultar leyenda (opcional)
+      plot.title = element_text(hjust = 0.5, face = "bold") # Centrar título
+    )
+  
+  # Imprimir el gráfico
+  print(bar_plot)
+}
+
+# Llamada a la función
+clasificar_y_graficar_enlaces(data)
+```
+
+### 3. Un gráfico de tarta (pie chart) indicando los porcentajes de Status de nuestro análisis. 
+
+Por ejemplo, si hay 6 enlaces con status “200” y 4 enlaces con status “404”, la 
+tarta mostrará un 60% con la etiqueta “200” y un 40% con la etiqueta “404”. Este 
+gráfico lo uniremos a los anteriores. El objetivo final es obtener una imagen que 
+recopile los gráficos generados. 
+
+```{r setup23, include=TRUE}
+##PREGUNTA 2.3
+
+# Resumir códigos de estado
+status_summary <- table(data$status_code)
+status_percent <- prop.table(status_summary) * 100
+
+# Darle color al pastel
+library(RColorBrewer)
+myPalette <- brewer.pal(5, "Set2") 
+
+# Crear gráfico de pastel
+pie_chart <- pie(
+  status_percent,
+  labels = paste0(names(status_percent), " (", round(status_percent, 1), "%)"),
+  main = "Distribución de Códigos de Estado",border="white", col=myPalette
+)
 
 ```

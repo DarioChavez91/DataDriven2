@@ -4,6 +4,9 @@
 # Cargar librerías
 library(httr)
 library(XML)
+library(dplyr)
+
+
 
 # Descargar la página
 url <- "https://www.mediawiki.org/wiki/MediaWiki"
@@ -16,8 +19,16 @@ content_xml <- htmlParse(content(response, as = "text"))
 ##PREGUNTA 1.2
 
 # Extraer el título
-title <- xpathSApply(content_xml, "//title", xmlValue)
-print(title)
+
+# Extraer el título de la página
+obtener_titulo <- function(xml_contenido) {
+  titulo <- xpathSApply(xml_contenido, "//title", xmlValue)
+  return(titulo)
+}
+
+# Ejemplo de uso
+titulo <- obtener_titulo(content_xml)
+cat("Título de la página:", titulo, "\n")
 
 
 ##PREGUNTA 1.3
@@ -34,12 +45,33 @@ texts <- unlist(texts)
 
 ##PREGUNTA 1.4
 
-# Crear data.frame
-data <- data.frame(Link = links, Text = texts)
-data_summary <- as.data.frame(table(data$Link))
+# Función para generar tabla de frecuencias y mantener el dataframe original
+procesar_enlaces <- function(links, texts) {
+  # Crear el dataframe con enlaces y textos
+  data <- data.frame(Link = links, Text = texts, stringsAsFactors = FALSE)
+  
+  # Generar la tabla de frecuencias
+  data_summary <- as.data.frame(table(data$Link), stringsAsFactors = FALSE)
+  
+  # Renombrar columnas para mayor claridad
+  colnames(data_summary) <- c("Link", "Frequency")
+  
+  # Ordenar la tabla de frecuencias por frecuencia descendente
+  data_summary <- data_summary[order(-data_summary$Frequency), ]
+  
+  # Devolver tanto la tabla de frecuencias como el dataframe original
+  return(list(data = data, data_summary = data_summary))
+}
 
-# Renombrar columnas
-colnames(data_summary) <- c("Link", "Frequency")
+# Llamar a la función y guardar los resultados
+resultados <- procesar_enlaces(links, texts)
+
+# Separar los resultados
+data <- resultados$data
+data_summary <- resultados$data_summary
+
+# Mostrar las primeras filas de la tabla de frecuencias
+head(data_summary)
 
 
 ##PREGUNTA 1.5
@@ -82,7 +114,7 @@ data$status_code <- sapply(data$Link, function(link) {
 })
 
 # Resumir los datos en el data.frame final 'final_data'
-library(dplyr)
+
 
 final_data <- data %>%
   group_by(Link) %>%
@@ -113,22 +145,37 @@ histogram_plot <- ggplot(data, aes(x = Type, fill = Type)) +
 print(histogram_plot)
 
 ##PREGUNTA 2.2
+# Función para clasificar enlaces y generar el gráfico de barras
+clasificar_y_graficar_enlaces <- function(data, dominio_interno = "mediawiki.org") {
+  library(ggplot2)
+  
+  # Clasificar enlaces como internos o externos
+  data$Domain <- ifelse(
+    grepl(dominio_interno, data$Link, fixed = TRUE), 
+    "Interno", 
+    "Externo"
+  )
+  
+  # Crear el gráfico de barras
+  bar_plot <- ggplot(data, aes(x = Domain, fill = Domain)) +
+    geom_bar() +
+    ggtitle("Enlaces Internos vs Externos") +
+    xlab("Tipo de Enlace") +
+    ylab("Cantidad") +
+    scale_fill_manual(values = c("Interno" = "#1f78b4", "Externo" = "#33a02c")) + # Colores personalizados
+    theme_minimal() +
+    theme(
+      legend.position = "none", # Ocultar leyenda (opcional)
+      plot.title = element_text(hjust = 0.5, face = "bold") # Centrar título
+    )
+  
+  # Imprimir el gráfico
+  print(bar_plot)
+}
 
-# Clasificar enlaces como internos o externos
-#data$Type <- ifelse(grepl("mediawiki.org", data$type), "Internal", "External")
+# Llamada a la función
+clasificar_y_graficar_enlaces(data)
 
-# Clasificar enlaces como internos o externos
-data$Domain <- ifelse(grepl("mediawiki.org", data$Link), "Internal", "External")
-
-# Crear gráfico de barras
-bar_plot <- ggplot(data, aes(x = Domain, fill = Domain)) +
-  geom_bar() +
-  ggtitle("Enlaces Internos vs Externos") +
-  xlab("Tipo de Enlace") +
-  ylab("Cantidad") +
-  theme_minimal()
-
-print(bar_plot)
 
 ##PREGUNTA 2.3
 
@@ -146,4 +193,3 @@ pie_chart <- pie(
   labels = paste0(names(status_percent), " (", round(status_percent, 1), "%)"),
   main = "Distribución de Códigos de Estado",border="white", col=myPalette
 )
-
