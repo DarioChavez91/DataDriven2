@@ -27,7 +27,9 @@ una página web, mediante su URL, y poder analizar su contenido HTML con tal de 
 datos e información específica. 
 Nuestro programa ha de ser capaz de cumplir con los siguientes pasos: 
 
-### 1. Descargar la página web de la URL indicada, y almacenarlo en un formato de R apto para ser tratado
+------------------------------------------------------------------------
+
+### **1. Descargar la página web de la URL indicada, y almacenarlo en un formato de R apto para ser tratado**
 
 El primer paso para realizar tareas de crawling y scraping es poder descargar los 
 datos de la web. Para esto usaremos la capacidad de R y de sus librerías (httr y 
@@ -49,7 +51,9 @@ response <- GET(url)
 content_xml <- htmlParse(content(response, as = "text"))
 ```
 
-### 2. Analizar el contenido de la web, buscando el título de la página (que en HTML se etiqueta como “title”). 
+------------------------------------------------------------------------
+
+### **2. Analizar el contenido de la web, buscando el título de la página (que en HTML se etiqueta como “title”). **
 
 En las cabeceras web encontramos información como el título, los ficheros de 
 estilo visual, y meta-información como el nombre del autor de la página, una 
@@ -69,9 +73,9 @@ titulo <- obtener_titulo(content_xml)
 cat("Título de la página:", titulo, "\n")
 ```
 
+------------------------------------------------------------------------
 
-
-### 3. Analizar el contenido de la web, buscando todos los enlaces (que en HTML se etiquetan como “a”), buscando el texto del enlace, así como la URL. 
+### **3. Analizar el contenido de la web, buscando todos los enlaces (que en HTML se etiquetan como “a”), buscando el texto del enlace, así como la URL.** 
 
 Vamos a extraer, usando las funciones de búsqueda XML, todos los enlaces que 
 salen de esta página con tal de listarlos y poder descargarlas más tarde. Sabemos 
@@ -94,7 +98,9 @@ links <- unlist(links)
 texts <- unlist(texts)
 ```
 
-### 4. AGenerar una tabla con cada enlace encontrado, indicando el texto que acompaña el enlace, y el número de veces que aparece un enlace con ese mismo objetivo. 
+------------------------------------------------------------------------
+
+### **4. AGenerar una tabla con cada enlace encontrado, indicando el texto que acompaña el enlace, y el número de veces que aparece un enlace con ese mismo objetivo.** 
 
 En este paso nos interesa reunir los datos obtenidos en el anterior paso. 
 Tendremos que comprobar, para cada enlace, cuantas veces aparece. 
@@ -129,7 +135,9 @@ data_summary <- resultados$data_summary
 head(data_summary)
 ```
 
-### 5. Para cada enlace, seguirlo e indicar si está activo (podemos usar el código de status HTTP al hacer una petición a esa URL). 
+------------------------------------------------------------------------
+
+### **5. Para cada enlace, seguirlo e indicar si está activo (podemos usar el código de status HTTP al hacer una petición a esa URL).** 
 En este paso podemos usar la función HEAD de la librería “httr”, que en vez de 
 descargarse la página como haría GET, solo consultamos los atributos de la 
 página o fichero destino. 
@@ -224,7 +232,7 @@ final_data <- data %>%
 
 ```
 
-
+------------------------------------------------------------------------
 
 ## Pregunta 2
 
@@ -232,7 +240,7 @@ Elaborad, usando las librerías de gráficos base y qplot (ggplot2), una infogra
 datos obtenidos. Tal infografía será una reunión de gráficos donde se muestren los 
 siguientes detalles: 
 
-### 1. Un histograma con la frecuencia de aparición de los enlaces, pero separado por URLs absolutas (con “http…”) y URLs relativas. 
+### **1. Un histograma con la frecuencia de aparición de los enlaces, pero separado por URLs absolutas (con “http…”) y URLs relativas.** 
 
 ```{r setup21, include=TRUE}
 ##PREGUNTA 2.1
@@ -253,7 +261,9 @@ histogram_plot <- ggplot(data, aes(x = Type, fill = Type)) +
 print(histogram_plot)
 ```
 
-### 2. Un gráfico de barras indicando la suma de enlaces que apuntan a otros  dominios o servicios (distinto a https://www.mediawiki.org en el caso de ejemplo) vs. la suma de los otros enlaces.
+------------------------------------------------------------------------
+
+### 2. **Un gráfico de barras indicando la suma de enlaces que apuntan a otros  dominios o servicios (distinto a https://www.mediawiki.org en el caso de ejemplo) vs. la suma de los otros enlaces.**
 
 Aquí queremos distinguir enlaces que apuntan a mediawiki versus el resto. 
 Sabemos que las URLs relativas ya apuntan dentro, por lo tanto hay que analizar 
@@ -292,7 +302,9 @@ clasificar_y_graficar_enlaces <- function(data, dominio_interno = "mediawiki.org
 clasificar_y_graficar_enlaces(data)
 ```
 
-### 3. Un gráfico de tarta (pie chart) indicando los porcentajes de Status de nuestro análisis. 
+------------------------------------------------------------------------
+
+### **3. Un gráfico de tarta (pie chart) indicando los porcentajes de Status de nuestro análisis.** 
 
 Por ejemplo, si hay 6 enlaces con status “200” y 4 enlaces con status “404”, la 
 tarta mostrará un 60% con la etiqueta “200” y un 40% con la etiqueta “404”. Este 
