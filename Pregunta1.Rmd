@@ -110,7 +110,6 @@ atributo “href” para indicar la URL del enlace. P.e.
 la URL de destino y con el valor del enlace (texto del enlace).
 
 ```{r setup3, include=TRUE}
-##PREGUNTA 1.3
 
 # Extraer enlaces y textos
 links <- xpathSApply(content_xml, "//a", xmlGetAttr, "href")

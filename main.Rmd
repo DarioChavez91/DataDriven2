@@ -10,5 +10,6 @@ runtime: shiny
 ```
 
 ```{r, child="Pregunta2.Rmd"}
+
 ```
 
