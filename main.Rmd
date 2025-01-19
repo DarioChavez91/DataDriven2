@@ -1,0 +1,14 @@
+---
+title: "respuesta"
+author: "Elkin Rodríguez"
+date: "2025-01-19"
+output: html_document
+runtime: shiny
+---
+
+```{r, child="Pregunta1.Rmd"}
+```
+
+```{r, child="Pregunta2.Rmd"}
+```
+

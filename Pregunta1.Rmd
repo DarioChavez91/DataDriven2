@@ -44,6 +44,8 @@ variables que podamos convertir en un formato fácil de analizar (p.e. de
 HTML a XML).
 
 ```{r setup1, include=TRUE}
+
+
 ##PREGUNTA 1.1
 
 # Cargar librerías
@@ -242,7 +244,8 @@ data$status_code <- sapply(data$Link, function(link) {
   })
   
   # Pausa entre solicitudes para evitar ser "baneados"
-  Sys.sleep(1)
+  #Sys.sleep(1)
+  Sys.sleep(runif(1, 0.5, 1))  # Pausa aleatoria entre 0.5 y 1 segundo
   
   # Retornar el código de estado
   return(status_code)
@@ -258,106 +261,5 @@ final_data <- data %>%
     Frequency = n(),
     Status_Code = first(status_code)
   )
-
-```
-
-------------------------------------------------------------------------
-
-## Pregunta 2
-
-Elaborad, usando las librerías de gráficos base y qplot (ggplot2), una
-infografía sobre los datos obtenidos. Tal infografía será una reunión de
-gráficos donde se muestren los siguientes detalles:
-
-### **1. Un histograma con la frecuencia de aparición de los enlaces, pero separado por URLs absolutas (con “http…”) y URLs relativas.**
-
-```{r setup21, include=TRUE, cache=TRUE}
-
-##PREGUNTA 2.1
-
-# Categorizar URLs como absolutas o relativas
-data$Type <- ifelse(grepl("^http", data$Link), "Absoluta", "Relativa")
-
-# Crear histograma
-library(ggplot2)
-
-histogram_plot <- ggplot(data, aes(x = Type, fill = Type)) +
-  geom_bar() +
-  ggtitle("Frecuencia de URLs Absolutas vs Relativas") +
-  xlab("Tipo de URL") +
-  ylab("Frecuencia") +
-  theme_minimal()
-
-print(histogram_plot)
-```
-
-------------------------------------------------------------------------
-
-### 2. **Un gráfico de barras indicando la suma de enlaces que apuntan a otros dominios o servicios (distinto a <https://www.mediawiki.org> en el caso de ejemplo) vs. la suma de los otros enlaces.**
-
-Aquí queremos distinguir enlaces que apuntan a mediawiki versus el
-resto. Sabemos que las URLs relativas ya apuntan dentro, por lo tanto
-hay que analizar las URLs absolutas y comprobar que apunten a
-<https://www.mediawiki.org>.
-
-```{r setup22, include=TRUE, cache=TRUE}
-# Función para clasificar enlaces y generar el gráfico de barras
-clasificar_y_graficar_enlaces <- function(data, dominio_interno = "mediawiki.org") {
-  library(ggplot2)
-  
-  # Clasificar enlaces como internos o externos
-  data$Domain <- ifelse(
-    grepl(dominio_interno, data$Link, fixed = TRUE), 
-    "Interno", 
-    "Externo"
-  )
-  
-  # Crear el gráfico de barras
-  bar_plot <- ggplot(data, aes(x = Domain, fill = Domain)) +
-    geom_bar() +
-    ggtitle("Enlaces Internos vs Externos") +
-    xlab("Tipo de Enlace") +
-    ylab("Cantidad") +
-    scale_fill_manual(values = c("Interno" = "#1f78b4", "Externo" = "#33a02c")) + # Colores personalizados
-    theme_minimal() +
-    theme(
-      legend.position = "none", # Ocultar leyenda (opcional)
-      plot.title = element_text(hjust = 0.5, face = "bold") # Centrar título
-    )
-  
-  # Imprimir el gráfico
-  print(bar_plot)
-}
-
-# Llamada a la función
-clasificar_y_graficar_enlaces(data)
-```
-
-------------------------------------------------------------------------
-
-### **3. Un gráfico de tarta (pie chart) indicando los porcentajes de Status de nuestro análisis.**
-
-Por ejemplo, si hay 6 enlaces con status “200” y 4 enlaces con status
-“404”, la tarta mostrará un 60% con la etiqueta “200” y un 40% con la
-etiqueta “404”. Este gráfico lo uniremos a los anteriores. El objetivo
-final es obtener una imagen que recopile los gráficos generados.
-
-```{r setup23, include=TRUE, cache=TRUE}
-##PREGUNTA 2.3
-
-# Resumir códigos de estado
-status_summary <- table(data$status_code)
-status_percent <- prop.table(status_summary) * 100
-
-# Darle color al pastel
-library(RColorBrewer)
-myPalette <- brewer.pal(5, "Set2") 
-
-# Crear gráfico de pastel
-pie_chart <- pie(
-  status_percent,
-  labels = paste0(names(status_percent), " (", round(status_percent, 1), "%)"),
-  main = "Distribución de Códigos de Estado",border="white", col=myPalette
-)
 
 ```
