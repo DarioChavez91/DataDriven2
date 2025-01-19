@@ -11,7 +11,7 @@
 
 <meta name="author" content="Dario Chávez &amp; Elkin Rodríguez" />
 
-<meta name="date" content="2025-01-18" />
+<meta name="date" content="2025-01-19" />
 
 <title>Práctico 2</title>
 
@@ -352,7 +352,7 @@ display: none;
 
 <h1 class="title toc-ignore">Práctico 2</h1>
 <h4 class="author">Dario Chávez &amp; Elkin Rodríguez</h4>
-<h4 class="date">2025-01-18</h4>
+<h4 class="date">2025-01-19</h4>
 
 </div>
 
@@ -400,13 +400,13 @@ content_xml &lt;- htmlParse(content(response, as = &quot;text&quot;))</code></pr
 </div>
 <div id="analizar-el-contenido-de-la-web-buscando-el-título-de-la-página-que-en-html-se-etiqueta-como-title." class="section level3">
 <h3><strong>2. Analizar el contenido de la web, buscando el título de la
-página (que en HTML se etiqueta como “title”). </strong></h3>
-En las cabeceras web encontramos información como el título, los
+página (que en HTML se etiqueta como “title”).</strong></h3>
+<p>En las cabeceras web encontramos información como el título, los
 ficheros de estilo visual, y meta-información como el nombre del autor
 de la página, una descripción de esta, el tipo de codificación de esta,
 o palabras clave que indican qué tipo de información contiene la página.
 Una vez descargada la página, y convertida a un formato analizable (como
-XML), buscaremos los elementos de tipo “title”. P.e. “
+XML), buscaremos los elementos de tipo “title”. P.e. “</p>
 <title>
 Titulo de Página
 </title>
@@ -421,13 +421,13 @@ titulo &lt;- obtener_titulo(content_xml)
 cat(&quot;Título de la página:&quot;, titulo, &quot;\n&quot;)</code></pre>
 <pre><code>## Título de la página: MediaWiki</code></pre>
 <ul>
-<li>xml_contenido: El contenido XML de la página web.</li>
-<li>xpathSApply: Aplica una expresión XPath sobre el contenido XML para
-seleccionar el nodo
+<li><p>xml_contenido: El contenido XML de la página web.</p></li>
+<li><p>xpathSApply: Aplica una expresión XPath sobre el contenido XML
+para seleccionar el nodo</p>
 <title>
-.</li>
-<li>xmlValue: Extrae el valor (contenido) del nodo seleccionado, es
-decir, el título de la página.</li>
+<p>.</p></li>
+<li><p>xmlValue: Extrae el valor (contenido) del nodo seleccionado, es
+decir, el título de la página.</p></li>
 </ul>
 <hr />
 </div>
@@ -496,10 +496,11 @@ head(data_summary)</code></pre>
 ## 10 /w/index.php?title=Special:CreateAccount&amp;returnto=MediaWiki         2
 ## 14     /w/index.php?title=Special:UserLogin&amp;returnto=MediaWiki         2</code></pre>
 <ul>
-<li>links: Vectores de enlaces encontrados en la página web.</li>
-<li>texts: Vectores de texto asociado a cada enlace encontrado.</li>
-<li>data: El dataframe original que contiene los enlaces y sus
-textos.</li>
+<li><p>links: Vectores de enlaces encontrados en la página web.</p></li>
+<li><p>texts: Vectores de texto asociado a cada enlace
+encontrado.</p></li>
+<li><p>data: El dataframe original que contiene los enlaces y sus
+textos.</p></li>
 <li><h2 id="data_summary-la-tabla-de-frecuencias-que-muestra-cuántas-veces-aparece-cada-enlace.">data_summary:
 La tabla de frecuencias, que muestra cuántas veces aparece cada
 enlace.</h2></li>
