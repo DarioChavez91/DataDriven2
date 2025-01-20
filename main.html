@@ -450,8 +450,8 @@ links &lt;- unlist(links)
 texts &lt;- unlist(texts)</code></pre>
 <hr />
 </div>
-<div id="agenerar-una-tabla-con-cada-enlace-encontrado-indicando-el-texto-que-acompaña-el-enlace-y-el-número-de-veces-que-aparece-un-enlace-con-ese-mismo-objetivo." class="section level3">
-<h3><strong>4. AGenerar una tabla con cada enlace encontrado, indicando
+<div id="generar-una-tabla-con-cada-enlace-encontrado-indicando-el-texto-que-acompaña-el-enlace-y-el-número-de-veces-que-aparece-un-enlace-con-ese-mismo-objetivo." class="section level3">
+<h3><strong>4. Generar una tabla con cada enlace encontrado, indicando
 el texto que acompaña el enlace, y el número de veces que aparece un
 enlace con ese mismo objetivo.</strong></h3>
 <p>En este paso nos interesa reunir los datos obtenidos en el anterior
@@ -485,21 +485,20 @@ data_summary &lt;- resultados$data_summary
 # Mostrar las primeras filas de la tabla de frecuencias
 head(data_summary)</code></pre>
 <pre><code>##                                                           Link Frequency
-## 70                                                           #         9
-## 24                                             /wiki/MediaWiki         5
-## 3                     /w/index.php?title=MediaWiki&amp;action=edit         2
-## 4                  /w/index.php?title=MediaWiki&amp;action=history         2
-## 10 /w/index.php?title=Special:CreateAccount&amp;returnto=MediaWiki         2
-## 14     /w/index.php?title=Special:UserLogin&amp;returnto=MediaWiki         2</code></pre>
+## 1                                                            #         9
+## 26                                             /wiki/MediaWiki         5
+## 5                     /w/index.php?title=MediaWiki&amp;action=edit         2
+## 6                  /w/index.php?title=MediaWiki&amp;action=history         2
+## 12 /w/index.php?title=Special:CreateAccount&amp;returnto=MediaWiki         2
+## 16     /w/index.php?title=Special:UserLogin&amp;returnto=MediaWiki         2</code></pre>
 <ul>
 <li><p>links: Vectores de enlaces encontrados en la página web.</p></li>
 <li><p>texts: Vectores de texto asociado a cada enlace
 encontrado.</p></li>
 <li><p>data: El dataframe original que contiene los enlaces y sus
 textos.</p></li>
-<li><h2 id="data_summary-la-tabla-de-frecuencias-que-muestra-cuántas-veces-aparece-cada-enlace.">data_summary:
-La tabla de frecuencias, que muestra cuántas veces aparece cada
-enlace.</h2></li>
+<li><p>data_summary: La tabla de frecuencias, que muestra cuántas veces
+aparece cada enlace.</p></li>
 </ul>
 </div>
 <div id="para-cada-enlace-seguirlo-e-indicar-si-está-activo-podemos-usar-el-código-de-status-http-al-hacer-una-petición-a-esa-url." class="section level3">

@@ -99,7 +99,7 @@ texts <- unlist(texts)
 
 ------------------------------------------------------------------------
 
-### **4. AGenerar una tabla con cada enlace encontrado, indicando el texto que acompaña el enlace, y el número de veces que aparece un enlace con ese mismo objetivo.**
+### **4. Generar una tabla con cada enlace encontrado, indicando el texto que acompaña el enlace, y el número de veces que aparece un enlace con ese mismo objetivo.**
 
 En este paso nos interesa reunir los datos obtenidos en el anterior paso. Tendremos que comprobar, para cada enlace, cuantas veces aparece.
 
@@ -139,9 +139,7 @@ head(data_summary)
 
 -   data: El dataframe original que contiene los enlaces y sus textos.
 
--   
-
-    ## data_summary: La tabla de frecuencias, que muestra cuántas veces aparece cada enlace.
+-   data_summary: La tabla de frecuencias, que muestra cuántas veces aparece cada enlace.
 
 ### **5. Para cada enlace, seguirlo e indicar si está activo (podemos usar el código de status HTTP al hacer una petición a esa URL).**
 
